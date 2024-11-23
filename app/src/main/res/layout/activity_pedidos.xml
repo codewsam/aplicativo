@@ -12,7 +12,7 @@
         android:layout_width="88dp"
         android:layout_height="87dp"
         android:layout_marginTop="100dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="28dp"
         android:backgroundTint="#C4A484"
         android:text="@string/addPedido"
         android:textColor="#FFFFFF"
@@ -21,7 +21,8 @@
         app:circularflow_radiusInDP="30dp"
         app:cornerRadius="30dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        tools:ignore="UnknownId" />
 
     <Button
         android:id="@+id/btnVoltar"
@@ -36,14 +37,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="350dp"
-        android:layout_height="199dp"
-        android:layout_marginTop="200dp"
-        android:text="@string/textoCentral"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnVoltar" />
+    <LinearLayout
+        android:id="@+id/linearLayoutPedidos"
+        android:layout_width="300dp"
+        android:layout_height="500dp"
+        android:layout_below="@id/btnAdicionarPedido"
+        android:layout_marginBottom="116dp"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="55dp"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

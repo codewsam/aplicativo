@@ -16,7 +16,7 @@
             android:name=".produtosActivity"
             android:exported="false" />
         <activity
-            android:name=".pedidosActivity"
+            android:name=".PedidosActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

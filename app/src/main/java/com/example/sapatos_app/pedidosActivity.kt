@@ -1,16 +1,28 @@
 package com.example.sapatos_app
 
-import android.app.DatePickerDialog
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore
+import android.view.LayoutInflater
 import android.widget.Button
+import android.widget.DatePicker
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import java.util.*
+import androidx.cardview.widget.CardView
+import java.io.IOException
 
 class PedidosActivity : AppCompatActivity() {
+
+    private val PICK_IMAGE_REQUEST = 1
+    private var imageUri: android.net.Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,70 +30,98 @@ class PedidosActivity : AppCompatActivity() {
 
         // Referência para o botão "+"
         val btnAddPedido: Button = findViewById(R.id.btnAdicionarPedido)
+        val linearLayoutPedidos = findViewById<LinearLayout>(R.id.linearLayoutPedidos)
+        val btnVoltar: Button = findViewById(R.id.btnVoltar)
+
 
         // Definindo a ação do botão "+"
         btnAddPedido.setOnClickListener {
-            showAddPedidoDialog()
+            showAddPedidoDialog(linearLayoutPedidos)
+        }
+        btnVoltar.setOnClickListener {
+            finish() // Finaliza a Activity atual e volta para a anterior na pilha de atividades
         }
     }
 
     // Função para exibir o AlertDialog para adicionar um pedido
-    private fun showAddPedidoDialog() {
-        // Inicializando os campos de entrada
-        val nomeClienteEditText = EditText(this)
-        val dataPedidoEditText = EditText(this)
-        val produtoEditText = EditText(this)
+    @SuppressLint("MissingInflatedId")
+    private fun showAddPedidoDialog(linearLayoutPedidos: LinearLayout) {
 
-        // Configurando a caixa de texto para a data
-        dataPedidoEditText.setFocusable(false)
-        dataPedidoEditText.setClickable(true)
-        dataPedidoEditText.setHint("Escolha a data")
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_pedido, null)
+        val nomeClienteEditText = dialogView.findViewById<EditText>(R.id.editNomeCliente)
+        val dataPedidoDatePicker = dialogView.findViewById<DatePicker>(R.id.datePicker)
+        val produtoEditText = dialogView.findViewById<EditText>(R.id.editProduto)
 
-        // Criando um DatePickerDialog para escolher a data
-        dataPedidoEditText.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            val datePickerDialog = DatePickerDialog(
-                this,
-                { _, year, monthOfYear, dayOfMonth ->
-                    // Formatação da data escolhida
-                    val date = "$dayOfMonth/${monthOfYear + 1}/$year"
-                    dataPedidoEditText.setText(date)
-                },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-            )
-            datePickerDialog.show()
+        // Botão para selecionar imagem
+        val btnSelectImage: Button = dialogView.findViewById(R.id.btnSelectImage)
+        btnSelectImage.setOnClickListener {
+            openGallery()
         }
 
-        // Construindo o layout do AlertDialog com os campos
-        val dialogView = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            addView(nomeClienteEditText)
-            addView(dataPedidoEditText)
-            addView(produtoEditText)
-        }
-
-        val alertDialog = AlertDialog.Builder(this)
+        // Criando o AlertDialog para adicionar um pedido
+        val dialog = AlertDialog.Builder(this)
             .setTitle("Adicionar Pedido")
             .setView(dialogView)
             .setPositiveButton("Adicionar") { _, _ ->
+
                 val nomeCliente = nomeClienteEditText.text.toString()
-                val dataPedido = dataPedidoEditText.text.toString()
+                val dataPedido = "${dataPedidoDatePicker.dayOfMonth}/${dataPedidoDatePicker.month + 1}/${dataPedidoDatePicker.year}"
                 val produto = produtoEditText.text.toString()
 
-                // Verificar se os campos estão preenchidos
-                if (nomeCliente.isNotEmpty() && dataPedido.isNotEmpty() && produto.isNotEmpty()) {
-                    // Ação a ser tomada após o envio do pedido (como salvar ou exibir no UI)
-                    Toast.makeText(this, "Pedido Adicionado!", Toast.LENGTH_SHORT).show()
-                    // Aqui você pode salvar os dados ou atualizar a interface de pedidos
+                if (nomeCliente.isNotEmpty() && produto.isNotEmpty()) {
+                    // Criar o CardView para exibir o pedido
+                    val pedidoCard = createPedidoCard(nomeCliente, dataPedido, produto)
+                    // Adicionar a imagem se houver
+                    if (imageUri != null) {
+                        val imageView: ImageView = pedidoCard.findViewById(R.id.imagePedido)
+                        imageView.setImageURI(imageUri)
+                    }
+                    // Adicionar o CardView ao LinearLayout
+                    linearLayoutPedidos.addView(pedidoCard)
                 } else {
-                    Toast.makeText(this, "Por favor, preencha todos os campos.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Por favor, preencha todos os campos", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancelar", null)
             .create()
 
-        alertDialog.show()
+        dialog.show()
+    }
+
+    // Função para criar o CardView com as informações do pedido
+    private fun createPedidoCard(nomeCliente: String, dataPedido: String, produto: String): CardView {
+        // Inflar o layout do CardView
+        val cardView = LayoutInflater.from(this).inflate(R.layout.item_pedido, null) as CardView
+
+        // Atribuir os valores aos TextViews dentro do CardView
+        val textNomeCliente = cardView.findViewById<TextView>(R.id.textNomeCliente)
+        val textDataPedido = cardView.findViewById<TextView>(R.id.textDataPedido)
+        val textProduto = cardView.findViewById<TextView>(R.id.textProduto)
+
+        textNomeCliente.text = "Cliente: $nomeCliente"
+        textDataPedido.text = "Data: $dataPedido"
+        textProduto.text = "Produto: $produto"
+
+        return cardView
+    }
+
+    // Função para abrir a galeria e escolher uma imagem
+    private fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(intent, PICK_IMAGE_REQUEST)
+    }
+
+    // Lidar com a imagem selecionada
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_REQUEST) {
+            imageUri = data?.data
+            try {
+                val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+                // Aqui você pode fazer algo com a imagem se necessário, como exibir
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
     }
 }

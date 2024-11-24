@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".produtosActivity">
 
+    <!-- Botão Voltar -->
     <Button
         android:id="@+id/btnVoltar"
         android:layout_width="wrap_content"
@@ -17,8 +18,26 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:backgroundTint="#C4A484"
-        android:textColor="#FFFFFF"/>
+        android:textColor="#FFFFFF" />
 
+    <!-- Barra de Pesquisa -->
+    <EditText
+        android:id="@+id/search_bar"
+        android:layout_width="348dp"
+        android:layout_height="43dp"
+        android:layout_marginTop="12dp"
+        android:background="@android:drawable/editbox_background"
+        android:drawablePadding="8dp"
+        android:hint="Pesquisar produto"
+        android:inputType="text"
+        android:padding="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnVoltar" />
 
+    <!-- Ícone de Pesquisa (Lupa) -->
+
+    <!-- ListView para Exibir os Produtos -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,6 @@
 package com.example.sapatos_app
 
+import PedidoDatabaseHelper
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -28,23 +29,55 @@ class PedidosActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pedidos)
 
-        // Referência para o botão "+"
         val btnAddPedido: Button = findViewById(R.id.btnAdicionarPedido)
         val linearLayoutPedidos = findViewById<LinearLayout>(R.id.linearLayoutPedidos)
         val btnVoltar: Button = findViewById(R.id.btnVoltar)
 
+        // Instanciando o banco de dados e buscando os pedidos
+        val pedidoDatabaseHelper = PedidoDatabaseHelper(this)
+        val pedidos = pedidoDatabaseHelper.getAllPedidos()
 
-        // Definindo a ação do botão "+"
+        // Exibindo os pedidos no LinearLayout
+        for (pedido in pedidos) {
+            val pedidoCard = createPedidoCard(pedido.nomeCliente, pedido.dataPedido, pedido.produto)
+            if (pedido.imagem != null) {
+                val imageView: ImageView = pedidoCard.findViewById(R.id.imagePedido)
+                imageView.setImageURI(android.net.Uri.parse(pedido.imagem))
+            }
+            linearLayoutPedidos.addView(pedidoCard)
+        }
+
         btnAddPedido.setOnClickListener {
             showAddPedidoDialog(linearLayoutPedidos)
         }
+
         btnVoltar.setOnClickListener {
-            finish() // Finaliza a Activity atual e volta para a anterior na pilha de atividades
+            finish()
+        }
+    }
+    override fun onResume() {
+        super.onResume()
+        val pedidoDatabaseHelper = PedidoDatabaseHelper(this)
+        val pedidos = pedidoDatabaseHelper.getAllPedidos()
+
+        val linearLayoutPedidos = findViewById<LinearLayout>(R.id.linearLayoutPedidos)
+        linearLayoutPedidos.removeAllViews()  // Limpa a tela antes de adicionar os pedidos
+
+        // Exibe os pedidos no layout
+        for (pedido in pedidos) {
+            val pedidoCard = createPedidoCard(pedido.nomeCliente, pedido.dataPedido, pedido.produto)
+            if (pedido.imagem != null) {
+                val imageView: ImageView = pedidoCard.findViewById(R.id.imagePedido)
+                imageView.setImageURI(android.net.Uri.parse(pedido.imagem))
+            }
+            linearLayoutPedidos.addView(pedidoCard)
         }
     }
 
+
     // Função para exibir o AlertDialog para adicionar um pedido
     @SuppressLint("MissingInflatedId")
+    // Dentro da PedidosActivity
     private fun showAddPedidoDialog(linearLayoutPedidos: LinearLayout) {
 
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_pedido, null)
@@ -63,12 +96,18 @@ class PedidosActivity : AppCompatActivity() {
             .setTitle("Adicionar Pedido")
             .setView(dialogView)
             .setPositiveButton("Adicionar") { _, _ ->
+                
 
                 val nomeCliente = nomeClienteEditText.text.toString()
                 val dataPedido = "${dataPedidoDatePicker.dayOfMonth}/${dataPedidoDatePicker.month + 1}/${dataPedidoDatePicker.year}"
                 val produto = produtoEditText.text.toString()
 
                 if (nomeCliente.isNotEmpty() && produto.isNotEmpty()) {
+                    // Salvar no banco de dados
+                    val pedidoDatabaseHelper = PedidoDatabaseHelper(this)
+                    val imagemUriString = imageUri?.toString() // Converte a URI da imagem em String
+                    pedidoDatabaseHelper.addPedido(nomeCliente, dataPedido, produto, imagemUriString)
+
                     // Criar o CardView para exibir o pedido
                     val pedidoCard = createPedidoCard(nomeCliente, dataPedido, produto)
                     // Adicionar a imagem se houver

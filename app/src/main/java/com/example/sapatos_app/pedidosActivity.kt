@@ -96,7 +96,7 @@ class PedidosActivity : AppCompatActivity() {
             .setTitle("Adicionar Pedido")
             .setView(dialogView)
             .setPositiveButton("Adicionar") { _, _ ->
-                
+
 
                 val nomeCliente = nomeClienteEditText.text.toString()
                 val dataPedido = "${dataPedidoDatePicker.dayOfMonth}/${dataPedidoDatePicker.month + 1}/${dataPedidoDatePicker.year}"

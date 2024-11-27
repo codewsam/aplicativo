@@ -19,6 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Botão Pedidos -->
     <Button
         android:id="@+id/btnPedidos"
         android:layout_width="wrap_content"
@@ -26,43 +27,26 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:backgroundTint="#C4A484"
-
         android:text="Pedidos"
         android:textColorHighlight="#9F3B1B"
         android:textColorLink="#9F3B1B"
-        app:layout_constraintBottom_toTopOf="@+id/btnClientes"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.509"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/btnProdutos" />
 
-    <Button
-        android:id="@+id/btnClientes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="1dp"
-        android:backgroundTint="#C4A484"
-        android:text="Clientes"
-        android:textColorHighlight="#650E0E"
-        android:textColorLink="#801616"
-        app:layout_constraintBottom_toTopOf="@+id/btnProdutos"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.509"
-        app:layout_constraintStart_toStartOf="parent" />
-
+    <!-- Botão Produtos -->
     <Button
         android:id="@+id/btnProdutos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="136dp"
         android:backgroundTint="#C4A484"
         android:text="Produtos"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.518"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

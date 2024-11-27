@@ -27,9 +27,12 @@ class ProdutosActivity : AppCompatActivity() {
 
         // Inicializar dados
         produtos = mutableListOf(
-            Produto("Imagem 1", R.drawable.girassollogo),
-            Produto("tênis vermelho", R.drawable.tenis_vermelho),
-            Produto("All star", R.drawable.allstar)
+            Produto("Salto preto", R.drawable.salto_preto),
+            Produto("Tênis vermelho", R.drawable.tenis_vermelho),
+            Produto("All star", R.drawable.allstar),
+            Produto("Salto rosa", R.drawable.salto_rosa),
+            Produto("Sandalia prata", R.drawable.sandalia_prata),
+            Produto("Sandalia preta", R.drawable.sandalia_preta)
         )
 
         adapter = ProdutoAdapter(produtos)

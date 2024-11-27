@@ -50,6 +50,13 @@
                 android:textSize="14sp"
                 android:textColor="#777" />
 
+            <Button
+                android:id="@+id/btnExcluirPedido"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Excluir"
+                android:layout_marginTop="10dp" />
+
         </LinearLayout>
 
     </LinearLayout>

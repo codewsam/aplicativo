@@ -39,7 +39,7 @@ class PedidosActivity : AppCompatActivity() {
 
         // Exibindo os pedidos no LinearLayout
         for (pedido in pedidos) {
-            val pedidoCard = createPedidoCard(pedido.nomeCliente, pedido.dataPedido, pedido.produto)
+            val pedidoCard = createPedidoCard(pedido.nomeCliente, pedido.dataPedido, pedido.produto, pedido.id) // Passando o pedido.id
             if (pedido.imagem != null) {
                 val imageView: ImageView = pedidoCard.findViewById(R.id.imagePedido)
                 imageView.setImageURI(android.net.Uri.parse(pedido.imagem))
@@ -55,17 +55,19 @@ class PedidosActivity : AppCompatActivity() {
             finish()
         }
     }
+
     override fun onResume() {
         super.onResume()
-        val pedidoDatabaseHelper = PedidoDatabaseHelper(this)
-        val pedidos = pedidoDatabaseHelper.getAllPedidos()
 
         val linearLayoutPedidos = findViewById<LinearLayout>(R.id.linearLayoutPedidos)
         linearLayoutPedidos.removeAllViews()  // Limpa a tela antes de adicionar os pedidos
 
         // Exibe os pedidos no layout
+        val pedidoDatabaseHelper = PedidoDatabaseHelper(this)
+        val pedidos = pedidoDatabaseHelper.getAllPedidos()
+
         for (pedido in pedidos) {
-            val pedidoCard = createPedidoCard(pedido.nomeCliente, pedido.dataPedido, pedido.produto)
+            val pedidoCard = createPedidoCard(pedido.nomeCliente, pedido.dataPedido, pedido.produto, pedido.id)
             if (pedido.imagem != null) {
                 val imageView: ImageView = pedidoCard.findViewById(R.id.imagePedido)
                 imageView.setImageURI(android.net.Uri.parse(pedido.imagem))
@@ -74,12 +76,9 @@ class PedidosActivity : AppCompatActivity() {
         }
     }
 
-
     // Função para exibir o AlertDialog para adicionar um pedido
     @SuppressLint("MissingInflatedId")
-    // Dentro da PedidosActivity
     private fun showAddPedidoDialog(linearLayoutPedidos: LinearLayout) {
-
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_pedido, null)
         val nomeClienteEditText = dialogView.findViewById<EditText>(R.id.editNomeCliente)
         val dataPedidoDatePicker = dialogView.findViewById<DatePicker>(R.id.datePicker)
@@ -97,7 +96,6 @@ class PedidosActivity : AppCompatActivity() {
             .setView(dialogView)
             .setPositiveButton("Adicionar") { _, _ ->
 
-
                 val nomeCliente = nomeClienteEditText.text.toString()
                 val dataPedido = "${dataPedidoDatePicker.dayOfMonth}/${dataPedidoDatePicker.month + 1}/${dataPedidoDatePicker.year}"
                 val produto = produtoEditText.text.toString()
@@ -109,7 +107,7 @@ class PedidosActivity : AppCompatActivity() {
                     pedidoDatabaseHelper.addPedido(nomeCliente, dataPedido, produto, imagemUriString)
 
                     // Criar o CardView para exibir o pedido
-                    val pedidoCard = createPedidoCard(nomeCliente, dataPedido, produto)
+                    val pedidoCard = createPedidoCard(nomeCliente, dataPedido, produto, pedidoDatabaseHelper.getLastPedidoId()) // Pega o último ID inserido
                     // Adicionar a imagem se houver
                     if (imageUri != null) {
                         val imageView: ImageView = pedidoCard.findViewById(R.id.imagePedido)
@@ -128,7 +126,7 @@ class PedidosActivity : AppCompatActivity() {
     }
 
     // Função para criar o CardView com as informações do pedido
-    private fun createPedidoCard(nomeCliente: String, dataPedido: String, produto: String): CardView {
+    private fun createPedidoCard(nomeCliente: String, dataPedido: String, produto: String, pedidoId: Long): CardView {
         // Inflar o layout do CardView
         val cardView = LayoutInflater.from(this).inflate(R.layout.item_pedido, null) as CardView
 
@@ -136,12 +134,34 @@ class PedidosActivity : AppCompatActivity() {
         val textNomeCliente = cardView.findViewById<TextView>(R.id.textNomeCliente)
         val textDataPedido = cardView.findViewById<TextView>(R.id.textDataPedido)
         val textProduto = cardView.findViewById<TextView>(R.id.textProduto)
+        val btnExcluirPedido = cardView.findViewById<Button>(R.id.btnExcluirPedido)
 
         textNomeCliente.text = "Cliente: $nomeCliente"
         textDataPedido.text = "Data: $dataPedido"
         textProduto.text = "Produto: $produto"
 
+        // Associar a exclusão do pedido com o botão
+        btnExcluirPedido.setOnClickListener {
+            excluirPedido(pedidoId, cardView)
+        }
+
         return cardView
+    }
+
+    private fun excluirPedido(pedidoId: Long, pedidoCard: CardView) {
+        val pedidoDatabaseHelper = PedidoDatabaseHelper(this)
+
+        // Excluir o pedido do banco de dados
+        val sucesso = pedidoDatabaseHelper.deletePedido(pedidoId)
+
+        if (sucesso > 0) {
+            // Se a exclusão foi bem-sucedida, remova o CardView da tela
+            val linearLayoutPedidos = findViewById<LinearLayout>(R.id.linearLayoutPedidos)
+            linearLayoutPedidos.removeView(pedidoCard)
+            Toast.makeText(this, "Pedido excluído com sucesso", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Erro ao excluir pedido", Toast.LENGTH_SHORT).show()
+        }
     }
 
     // Função para abrir a galeria e escolher uma imagem

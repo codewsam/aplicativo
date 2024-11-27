@@ -72,7 +72,31 @@ class PedidoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABAS
         db.close() // Fecha o banco de dados
         return pedidos // Retorna a lista de pedidos
     }
+
+    fun deletePedido(pedidoId: Long): Int {
+        val db = this.writableDatabase
+        val args = arrayOf(pedidoId.toString()) // Convertendo para String, porque o método delete espera uma String no lugar de Long
+        return db.delete("pedidos", "id = ?", args)
+    }
+
+    fun getLastPedidoId(): Long {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT id FROM pedidos ORDER BY id DESC LIMIT 1", null)
+        if (cursor != null && cursor.moveToFirst()) {
+            val id = cursor.getLong(cursor.getColumnIndex("id"))
+            cursor.close()
+            return id
+        }
+        cursor?.close()
+        return -1  // Retorna -1 se não encontrar nenhum pedido
+    }
+
+
 }
+
+
+
+
 
 // Classe que representa um Pedido
 data class Pedido(
